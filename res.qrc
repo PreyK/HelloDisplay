@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="newPrefix">
+    <file>rotateGray.png</file>
+    <file>resolutionGray.png</file>
+    <file>resolution.png</file>
+  </qresource>
+</RCC>
