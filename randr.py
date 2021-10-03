@@ -22,6 +22,13 @@ import subprocess as sb
 from typing import ByteString, List
 
 from six import iteritems
+import types
+
+
+def ApplyEventExec():
+    print("event executed after settings applied")
+
+ApplyEvent = ApplyEventExec
 
 class Mode(object):
     """docstring for Mode"""
@@ -121,6 +128,9 @@ class Screen(object):
         for m in self.supported_modes:
             if m.current:
                 return m
+
+    def get_current_resolution(self):
+        return self.set.resolution
             
         
     def set_resolution(self, newres):
@@ -220,9 +230,13 @@ class Screen(object):
         return cmd
 
     def apply_settings(self):
-        print("APPLYING R")
+        #print("APPLYING R")
         exec_cmd(self.build_cmd())
         self.set.reset()
+        #print("settings applied, raise event for UI reinit")
+        #ApplyEvent()
+
+
 
     def __str__(self):
         return '{0}, primary: {1}, modes: {2}, conn: {3}, rot: {4}, ' \
@@ -242,6 +256,12 @@ class RotateDirection(object):
                  Inverted: 'inverted', Right: 'right'}
     nametoval = dict((v, k) for k, v in iteritems(valtoname))
 
+
+
+def applyAllScreens(screens):
+    for screen in screens:
+        screen.apply_settings()
+    ApplyEvent()
 
 def rot_to_str(rot):
     if rot in RotateDirection.valtoname:
