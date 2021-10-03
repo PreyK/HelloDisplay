@@ -11,6 +11,7 @@ from PyQt5.QtCore import QMimeData
 from PyQt5.QtWidgets import QApplication, QMainWindow, QGraphicsScene
 from PyQt5.QtGui import QDrag, QPalette, QColor, QMouseEvent, QPaintEvent
 import sys
+import time
 
 # EDID and RANDR stuff
 # TODO: add edid as standalone module like RANDR
@@ -30,15 +31,29 @@ class DisplayWindow(QtWidgets.QMainWindow):
         global MainWindow
         self.setAcceptDrops(True)
         self.applyButton.clicked.connect(self.applySettings)
+
         self.edidRegistry = Registry.from_csv('edid.csv')
         MainWindow = self
 
         self.initDisplayWidgets()
 
         self.show()
-        self.SelectScreen(self.DisplayWidgets[0])
+        self.selectPrimaryScreen()
+        randr.ApplyEvent = self.requeryRandr
+
+
+    def requeryRandr(self):
+        self.close()
+        self.__init__()
+
+    def selectPrimaryScreen(self):
+        for widget in self.DisplayWidgets:
+            if(widget.randr_screen.primary):
+                self.SelectScreen(widget)
+
 
     def initDisplayWidgets(self):
+        print("INIDWIDGETS")
         for display in randr.connected_screens():
             if display.is_enabled():
                 dv = self.AddScreenWidget(display)
@@ -48,9 +63,21 @@ class DisplayWindow(QtWidgets.QMainWindow):
         print(self.resolutionBox.currentIndex())
         self.selectedDisplayWidget.setResolution(self.resolutionBox.currentIndex())
 
+    def rotationChanged(self):
+        print("rotation changed")
+        print(self.RotationBox.currentIndex())
+        self.selectedDisplayWidget.setRotation(self.RotationBox.currentIndex())
+
+    def primaryChanged(self):
+        print("primary display changed")
+        self.selectedDisplayWidget.setPrimary(self.primaryDisplayCheckbox.isChecked())
+
     def applySettings(self):
+        screens = []
         for dw in self.DisplayWidgets:
-            dw.applySettings()
+            screens.append(dw.randr_screen)
+        randr.applyAllScreens(screens)
+
 
     def AddScreenWidget(self, screen):
         v = DisplayWidget()
@@ -61,6 +88,13 @@ class DisplayWindow(QtWidgets.QMainWindow):
     def SelectScreen(self, displayWidget):
         if self.resolutionBox.receivers(self.resolutionBox.currentIndexChanged) > 0:
             self.resolutionBox.currentIndexChanged.disconnect()
+
+        if self.RotationBox.receivers(self.RotationBox.currentIndexChanged) > 0:
+            self.RotationBox.currentIndexChanged.disconnect()
+
+        if self.primaryDisplayCheckbox.receivers(self.primaryDisplayCheckbox.stateChanged) >0:
+            self.primaryDisplayCheckbox.stateChanged.disconnect()
+
 
         self.selectedDisplayLabel.setText(displayWidget.displayName)
         self.selectedDisplayLabel.updateGeometry()
@@ -73,21 +107,37 @@ class DisplayWindow(QtWidgets.QMainWindow):
             if mode:
                 self.resolutionBox.addItem(randr.formatResolutionToString(mode.resolution()))
 
-        current_mode = displayWidget.randr_screen.get_current_mode()
-        current_resolution = randr.formatResolutionToString(current_mode.resolution())
-        current_resolution_index = self.resolutionBox.findText(current_resolution)
+
+
+        current_resolution_index = 0
+
+        if(displayWidget.randr_screen.get_current_resolution()):
+            #this has unapplied settings, display it!
+            current_resolution = randr.formatResolutionToString(displayWidget.randr_screen.get_current_resolution())
+            current_resolution_index = self.resolutionBox.findText(current_resolution)
+        else:
+            current_mode = displayWidget.randr_screen.get_current_mode()
+            current_resolution = randr.formatResolutionToString(current_mode.resolution())
+            current_resolution_index = self.resolutionBox.findText(current_resolution)
+            #self.resolutionBox.setCurrentIndex(current_resolution_index)
+
+
         self.resolutionBox.setCurrentIndex(current_resolution_index)
-
-
         self.resolutionBox.currentIndexChanged.connect(self.resolutionChanged)
+
 
         for i in range(1, 5):
             self.RotationBox.addItem(randr.rot_to_str(i))
+
+
 
         current_rot = randr.rot_to_str(displayWidget.randr_screen.rotation);
         current_rot_index = self.RotationBox.findText(current_rot)
         self.RotationBox.setCurrentIndex(current_rot_index)
         self.primaryDisplayCheckbox.setCheckState(displayWidget.randr_screen.primary * 2)
+
+        self.RotationBox.currentIndexChanged.connect(self.rotationChanged)
+        self.primaryDisplayCheckbox.stateChanged.connect(self.primaryChanged)
 
     def dragEnterEvent(self, event):
         event.accept()
@@ -128,17 +178,25 @@ class DisplayWidget(QtWidgets.QWidget):
         self.isDragged = False
 
     def applySettings(self):
-        if self.isChanged:
-            self.randr_screen.apply_settings()
+        #if self.isChanged:
+        self.randr_screen.apply_settings()
 
     def setResolution(self, resolutionIndex):
         self.wantedResolution = self.randr_screen.supported_modes[resolutionIndex]
         resw = self.wantedResolution.width
         resh = self.wantedResolution.height
+        self.randr_screen.set_resolution(self.randr_screen.supported_modes[resolutionIndex].resolution())
 
+    def setRotation(self, rotationIndex):
+        print("SETROT")
+        self.randr_screen.rotate(rotationIndex+1)
 
     def setRefreshRate(self, refreshRate):
         self.wantedRefreshRate = refreshRate
+
+    def setPrimary(self, isPrimary):
+        print(isPrimary)
+        self.randr_screen.set_as_primary(isPrimary)
 
     def SetScreen(self, screen):
         mode = screen.get_current_mode()
