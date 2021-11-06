@@ -95,6 +95,8 @@ class Screen(object):
 
         self.set = ScreenSettings()
         self.set.is_enabled = self.is_enabled()
+        self.set.is_primary = primary
+        #self.set.rotation = self.rotation
 
 
     def is_connected(self):
@@ -153,6 +155,7 @@ class Screen(object):
 
         """
         self.set.is_primary = is_primary
+        print(self.set.is_primary)
 
     def set_enabled(self, enable):
         """Enable or disable the output
@@ -415,6 +418,8 @@ def parse_xrandr(lines):
         screens.append(create_screen(sc_name_line, modes))
 
     return screens
+
+
 
 
 def connected_screens():
