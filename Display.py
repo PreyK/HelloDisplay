@@ -131,12 +131,10 @@ class DisplayWindow(QtWidgets.QMainWindow):
 
 
 
-        current_rot = randr.rot_to_str(displayWidget.randr_screen.rotation)
+        current_rot = randr.rot_to_str(displayWidget.randr_screen.rotation);
         current_rot_index = self.RotationBox.findText(current_rot)
         self.RotationBox.setCurrentIndex(current_rot_index)
-
-        self.primaryDisplayCheckbox.setCheckState(displayWidget.randr_screen.set.is_primary*2)
-        #print(displayWidget.randr_screen.set)
+        self.primaryDisplayCheckbox.setCheckState(displayWidget.randr_screen.primary * 2)
 
         self.RotationBox.currentIndexChanged.connect(self.rotationChanged)
         self.primaryDisplayCheckbox.stateChanged.connect(self.primaryChanged)
@@ -197,18 +195,8 @@ class DisplayWidget(QtWidgets.QWidget):
         self.wantedRefreshRate = refreshRate
 
     def setPrimary(self, isPrimary):
-        if isPrimary:
-            for screen in MainWindow.DisplayWidgets:
-                screen.randr_screen.set_as_primary(False)
-            self.randr_screen.set_as_primary(True)
-        else:
-            self.randr_screen.set_as_primary(False)
-            MainWindow.DisplayWidgets.randr_screen[0].set_as_primary(True)
-
-        #print(self.randr_screen)
-        #print(MainWindow.DisplayWidgets)
-
-        #print("SETPRIM CALLED")
+        print(isPrimary)
+        self.randr_screen.set_as_primary(isPrimary)
 
     def SetScreen(self, screen):
         mode = screen.get_current_mode()
@@ -234,7 +222,6 @@ class DisplayWidget(QtWidgets.QWidget):
         self.connectorLabel.setText(screen.name)
         self.manufacturerLabel.adjustSize()
         self.connectorLabel.adjustSize()
-        print("SCREEN SET")
 
 
     def setDisplayPosition(self):
