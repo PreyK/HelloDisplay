@@ -23,7 +23,7 @@ Other files in the repo considered scratch/prototyping, will be cleaned up.
 
 ### running:
 1. Install pyedid https://pypi.org/project/pyedid/
-2. run Dispsly.py
+2. run Display.py
 3. You should be able to select display resolutions, rotations and set a screen as primary.
 
 ### ToDo:
