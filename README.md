@@ -35,6 +35,7 @@ Other files in the repo considered scratch/prototyping, will be cleaned up.
 * Make display settings persist after reboot. (when Randr.py applies the settings it builds a shell command and executes it. Possibly we'd just need to write it to a startup path so it executes the last selected display layout on boot, haven't tested yet.)
 * Add multi-monitor options for "mirror screen, turn-off, extend" and show it on the UI.
 * Add advanced options (refresh rate, color space, etc..)
+* Make UI nice and fancy
 
 
 ### acknowledgements:
