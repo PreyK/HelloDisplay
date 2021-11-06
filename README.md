@@ -36,6 +36,7 @@ Other files in the repo considered scratch/prototyping, will be cleaned up.
 * Add multi-monitor options for "mirror screen, turn-off, extend" and show it on the UI.
 * Add advanced options (refresh rate, color space, etc..)
 * Make UI nice and fancy
+* Codereview and refactor. I'm not a python programmer, any insights welcome :D 
 
 
 ### acknowledgements:
