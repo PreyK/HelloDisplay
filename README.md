@@ -27,7 +27,7 @@ Other files in the repo considered scratch/prototyping, will be cleaned up.
 3. You should be able to select display resolutions, rotations and set a screen as primary.
 
 ### ToDo:
-* Get display placement (randr position X, Y) working. The UI shows it but it doesn't yet have an effect.
+* Get display placement (randr position X, Y) working. The UI shows it but it doesn't yet have an effect on apply.
 * Get PyEdid as one file .py like Randr.py so we don't need pip dependencies.
 * BUG: When a display is selected as primary, the UI doesn't correctly show the display's current rotation. (It always shows landscape even if it's portrait)
 * Find a way to properly reinitialize the UI after applied settings without needing to close and restart the whole UI.
