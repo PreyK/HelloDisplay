@@ -229,8 +229,12 @@ class DisplayWidget(QtWidgets.QWidget):
         # left = 2
         self.edid = pyedid.parse_edid(randr.get_edid_for_output(self.randr_screen.name), MainWindow.edidRegistry)
 
-        self.displayName = self.edid.manufacturer.split(" ")[0] + " " + self.edid.name;
-        self.manufacturerLabel.setText(self.edid.manufacturer.split(" ")[0] + " " + self.edid.name)
+        self.displayName = "Unknown"
+        try:
+            self.displayName = self.edid.manufacturer.split(" ")[0] + " " + self.edid.name
+        except:
+            pass
+        self.manufacturerLabel.setText(self.displayName)
         self.connectorLabel.setText(screen.name)
         self.manufacturerLabel.adjustSize()
         self.connectorLabel.adjustSize()
